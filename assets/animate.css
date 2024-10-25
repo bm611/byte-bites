@@ -1,0 +1,24 @@
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 3px #4f46e5, 0 0 6px #4f46e5, 0 0 9px #4f46e5;
+  }
+  50% {
+    box-shadow: 0 0 12px #4f46e5, 0 0 18px #4f46e5, 0 0 24px #4f46e5;
+  }
+}
+
+@keyframes fadeInWord {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-word {
+  display: inline-block;
+  opacity: 0;
+  animation: fadeInWord 0.5s ease-out forwards;
+}
+
+.animate-word:nth-child(1) { animation-delay: 0.1s; }
+.animate-word:nth-child(2) { animation-delay: 0.2s; }
+.animate-word:nth-child(3) { animation-delay: 0.3s; }
+.animate-word:nth-child(4) { animation-delay: 0.4s; }
