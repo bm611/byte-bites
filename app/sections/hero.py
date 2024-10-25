@@ -12,6 +12,7 @@ def hero_section():
                 rx.text(
                     "Harnessing the power of advanced language models to bring recipes to life",
                     class_name="text-sm md:text-xl max-w-lg mx-4 md:mx-0 mt-2 text-center animate-word text-black",
+                    display=["none", "block", "block"],
                 ),
                 rx.grid(
                     rx.card(
