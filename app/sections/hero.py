@@ -20,7 +20,7 @@ def hero_section():
                                 rx.icon("utensils", size=24),
                                 rx.text(
                                     "Smart Recipe Search",
-                                    class_name="text-lg",
+                                    class_name="text-lg font-semibold",
                                 ),
                                 class_name="flex justify-center items-center",
                             ),
@@ -37,7 +37,7 @@ def hero_section():
                                 rx.icon("scale", size=24),
                                 rx.text(
                                     "Ingredient Conversion",
-                                    class_name="text-lg",
+                                    class_name="text-lg font-semibold",
                                 ),
                                 class_name="flex justify-center items-center",
                             ),
@@ -54,7 +54,7 @@ def hero_section():
                                 rx.icon("clock", size=24),
                                 rx.text(
                                     "Meal Planning",
-                                    class_name="text-lg",
+                                    class_name="text-lg font-semibold",
                                 ),
                                 class_name="flex justify-center items-center",
                             ),
