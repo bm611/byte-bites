@@ -20,6 +20,7 @@ style = {
     "font_family": "Lexend",
     "font_size": "16px",
     "background_color": "#FFDDE1",
+    "color": "black",
 }
 
 

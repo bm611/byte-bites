@@ -8,6 +8,9 @@ def nav_section() -> rx.Component:
             rx.button(
                 "Github",
                 class_name="text-xl text-black bg-transparent hidden md:block underline cursor-pointer",
+                on_click=rx.redirect(
+                    "https://github.com/bm611/byte-bites/tree/main", external=True
+                ),
             ),
             class_name="flex justify-center md:justify-between items-center h-full mx-6",
         ),

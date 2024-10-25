@@ -65,7 +65,7 @@ def hero_section():
                         ),
                         class_name="p-4 hover:shadow-lg transition-shadow cursor-pointer text-black border-2 border-black bg-[#00E1D9] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
                     ),
-                    class_name="mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4",
+                    class_name="mt-4 w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4",
                 ),
                 class_name="w-full flex items-center justify-center",
             ),
