@@ -1,6 +1,27 @@
 import reflex as rx
+from typing import List, TypedDict
 
-recipe_data = {
+
+# Define the structure for ingredients
+class Ingredient(TypedDict):
+    item: str
+    amount: int
+    unit: str
+
+
+# Define the structure for recipe
+class Recipe(TypedDict):
+    title: str
+    description: str
+    prepTime: str
+    cookTime: str
+    servings: int
+    calories: int
+    ingredients: List[Ingredient]
+    instructions: List[str]
+
+
+recipe_data: Recipe = {
     "title": "Healthy Breakfast Omelette",
     "description": "A light and nutritious omelette packed with vegetables.",
     "prepTime": "5 minutes",
@@ -27,18 +48,44 @@ recipe_data = {
 }
 
 
+def render_instructions(steps: str):
+    return rx.list_item(
+        steps,
+        class_name="font-medium",
+    )
+
+
+def render_ingredients(items: Ingredient):
+    return rx.hstack(
+        rx.text(items["item"], class_name="font-bold"),
+        rx.text(f"{items['amount']}{items['unit']}"),
+        class_name="flex justify-between items-center border-b-2 border-black pb-2 w-full",
+    )
+
+
+class State(rx.State):
+    recipe: Recipe = recipe_data
+
+    @rx.var
+    def ingredients(self) -> List[Ingredient]:
+        return self.recipe["ingredients"]
+
+    @rx.var
+    def instructions(self) -> List[str]:
+        return self.recipe["instructions"]
+
+
 def recipe_page() -> rx.Component:
     return rx.box(
         # Hero Section
         rx.box(
             rx.image(
                 src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&q=80",
-                alt=recipe_data["title"],
                 class_name="w-full h-full object-cover opacity-80",
             ),
             rx.box(class_name="absolute inset-0 bg-black/20"),
             rx.heading(
-                recipe_data["title"],
+                State.recipe["title"],
                 class_name="absolute bottom-6 left-6 text-6xl font-black text-white tracking-tight drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]",
             ),
             class_name="relative h-[40vh] bg-black",
@@ -48,7 +95,7 @@ def recipe_page() -> rx.Component:
             # Description Card
             rx.box(
                 rx.text(
-                    recipe_data["description"],
+                    State.recipe["description"],
                     class_name="text-xl",
                 ),
                 class_name="bg-white border-4 border-black p-6 mb-8 transform rotate-[-1deg]",
@@ -58,25 +105,25 @@ def recipe_page() -> rx.Component:
                 rx.box(
                     rx.icon("clock", size=24, class_name="mb-2"),
                     rx.text("Prep Time", class_name="font-bold"),
-                    rx.text(recipe_data["prepTime"]),
+                    rx.text(State.recipe["prepTime"]),
                     class_name="bg-orange-400 border-4 border-black p-4 transform rotate-1",
                 ),
                 rx.box(
                     rx.icon("chef-hat", size=24, class_name="mb-2"),
                     rx.text("Cook Time", class_name="font-bold"),
-                    rx.text(recipe_data["cookTime"]),
+                    rx.text(State.recipe["cookTime"]),
                     class_name="bg-green-400 border-4 border-black p-4 transform rotate-[-1deg]",
                 ),
                 rx.box(
                     rx.icon("users", size=24, class_name="mb-2"),
                     rx.text("Servings", class_name="font-bold"),
-                    rx.text(f"{recipe_data['servings']} person"),
+                    rx.text(f"{State.recipe['servings']} person"),
                     class_name="bg-blue-400 border-4 border-black p-4 transform rotate-1",
                 ),
                 rx.box(
                     rx.icon("flame", size=24, class_name="mb-2"),
                     rx.text("Calories", class_name="font-bold"),
-                    rx.text(f"{recipe_data['calories']} kcal"),
+                    rx.text(f"{State.recipe['calories']} kcal"),
                     class_name="bg-red-400 border-4 border-black p-4 transform rotate-[-1deg]",
                 ),
                 class_name="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12",
@@ -91,14 +138,7 @@ def recipe_page() -> rx.Component:
                         class_name="text-3xl font-black mb-6 flex items-center gap-2",
                     ),
                     rx.vstack(
-                        *[
-                            rx.hstack(
-                                rx.text(ingredient["item"], class_name="font-bold"),
-                                rx.text(f"{ingredient['amount']}{ingredient['unit']}"),
-                                class_name="flex justify-between items-center border-b-2 border-black pb-2 w-full",
-                            )
-                            for ingredient in recipe_data["ingredients"]
-                        ],
+                        rx.foreach(State.ingredients, render_ingredients),
                         class_name="space-y-3",
                     ),
                     class_name="bg-purple-200 border-4 border-black p-6 transform rotate-1",
@@ -107,13 +147,7 @@ def recipe_page() -> rx.Component:
                 rx.box(
                     rx.heading("Instructions", class_name="text-3xl font-black mb-6"),
                     rx.ordered_list(
-                        *[
-                            rx.list_item(
-                                instruction,
-                                class_name="font-medium",
-                            )
-                            for instruction in recipe_data["instructions"]
-                        ],
+                        rx.foreach(State.instructions, render_instructions),
                         class_name="list-decimal list-inside space-y-4",
                     ),
                     class_name="bg-cyan-200 border-4 border-black p-6 transform rotate-[-1deg]",

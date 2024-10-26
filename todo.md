@@ -1,0 +1,2 @@
+- change search type design
+- add gemini backend
