@@ -87,6 +87,29 @@ def recipe_page() -> rx.Component:
                     ),
                     class_name="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12",
                 ),
+                rx.center(
+                    rx.box(
+                        rx.vstack(
+                            rx.heading("Serving Size", class_name="text-2xl underline"),
+                            rx.heading(State.serving_slider),
+                            rx.slider(
+                                default_value=State.default_serving_size,
+                                min_=1,
+                                max=20,
+                                on_change=State.set_end.throttle(100),
+                                color_scheme="orange",
+                            ),
+                            rx.button(
+                                "Update Serving Size",
+                                class_name="bg-orange-400 text-black px-4 py-2 rounded-none mt-4 hover:bg-orange-500 border-2 border-black",
+                                on_click=State.handle_serving,
+                            ),
+                            width="100%",
+                            align="center",
+                        ),
+                        class_name="w-full md:w-1/2 bg-white border-4 border-black p-6 mb-8 transform rotate-[-1deg]",
+                    ),
+                ),
                 # Two Column Layout
                 rx.grid(
                     # Ingredients
@@ -122,5 +145,4 @@ def recipe_page() -> rx.Component:
             width="100%",
         ),
         class_name="min-h-screen bg-yellow-50",
-        on_mount=State.handle_submit,
     )

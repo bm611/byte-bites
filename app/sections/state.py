@@ -24,6 +24,25 @@ client = OpenAI(
 )
 
 
+# Define the structure for ingredients
+class Ingredient(TypedDict):
+    item: str
+    amount: int | float
+    unit: str
+
+
+# Define the structure for recipe
+class Recipe(TypedDict):
+    title: str
+    description: str
+    prepTime: str
+    cookTime: str
+    servings: int
+    calories: int
+    ingredients: List[Ingredient]
+    instructions: List[str]
+
+
 def generate_recipe_image(user_prompt):
     response = client.images.generate(
         prompt=user_prompt,
@@ -73,23 +92,47 @@ def generate_recipe(user_prompt):
     return response
 
 
-# Define the structure for ingredients
-class Ingredient(TypedDict):
-    item: str
-    amount: int
-    unit: str
+def recalculate_recipe(recipe_json: Recipe, servings: int):
+    """Recalculates recipe ingredient amounts based on the desired number of servings.
 
+    Args:
+        recipe_json: A JSON string or Python dictionary representing the recipe.
+        servings: The desired number of servings.
 
-# Define the structure for recipe
-class Recipe(TypedDict):
-    title: str
-    description: str
-    prepTime: str
-    cookTime: str
-    servings: int
-    calories: int
-    ingredients: List[Ingredient]
-    instructions: List[str]
+    Returns:
+        A new dictionary with the updated ingredient amounts, or None if input is invalid.
+    """
+
+    try:
+        if isinstance(recipe_json, str):
+            recipe = json.loads(recipe_json)
+        elif isinstance(recipe_json, dict):
+            recipe = recipe_json
+        else:
+            return None  # Handle invalid input type
+
+        original_servings = recipe.get("servings", 1)  # default to 1 if missing
+
+        if original_servings <= 0 or servings <= 0:
+            return None  # Handle invalid serving sizes.
+
+        scaling_factor = servings / original_servings
+
+        for ingredient in recipe["ingredients"]:
+            if "amount" in ingredient and isinstance(
+                ingredient["amount"], (int, float)
+            ):
+                ingredient["amount"] = round(
+                    ingredient["amount"] * scaling_factor, 1
+                )  # round to 1 decimal
+
+        recipe["servings"] = servings  # update servings in the recipe
+
+        return recipe
+
+    except (json.JSONDecodeError, KeyError) as e:
+        print(f"Error processing recipe: {e}")
+        return None
 
 
 recipe_data: Recipe = {
@@ -124,6 +167,16 @@ class State(rx.State):
     user_prompt: str = ""
     is_generating: bool = False
     recipe_img_url: str = ""
+    serving_slider: int = 1
+    default_serving_size: int = 0
+
+    def set_end(self, value: list[int]):
+        self.serving_slider = value[0]
+
+    def handle_serving(self):
+        new_recipe = recalculate_recipe(self.recipe, self.serving_slider)
+        if new_recipe is not None:
+            self.recipe = new_recipe
 
     def set_query(self, query: str):
         self.user_prompt = query
@@ -133,6 +186,9 @@ class State(rx.State):
 
     def handle_submit(self):
         self.recipe: Recipe = generate_recipe(self.user_prompt)
+        # self.recipe: Recipe = recipe_data
+        self.default_serving_size = self.recipe["servings"]
+        self.serving_slider = self.recipe["servings"]
         img_url = generate_recipe_image(self.user_prompt)
         if img_url is not None:
             self.recipe_img_url = img_url
