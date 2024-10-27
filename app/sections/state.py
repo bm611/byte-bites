@@ -5,7 +5,6 @@ import os
 import json
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-# gemini api config
 genai.configure(api_key=GEMINI_API_KEY)
 model_json = genai.GenerativeModel(
     "gemini-1.5-flash-002",
@@ -102,12 +101,17 @@ recipe_data: Recipe = {
 class State(rx.State):
     recipe: Recipe = recipe_data
     user_prompt: str = ""
+    is_generating: bool = False
 
     def set_query(self, query: str):
         self.user_prompt = query
 
+    def start_generation(self):
+        self.is_generating = True
+
     def handle_submit(self):
         self.recipe: Recipe = generate_recipe(self.user_prompt)
+        self.is_generating = False
         return rx.redirect("/recipe")
 
     @rx.var
