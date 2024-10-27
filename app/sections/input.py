@@ -33,6 +33,7 @@ def input_section() -> rx.Component:
                 rx.tabs.content(
                     rx.input(
                         class_name="mt-2 md:mt-4 h-12 w-full px-2 md:w-[40rem] text-xl bg-transparent rounded-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-1 hover:translate-y-1 transition-all focus:outline-none text-black",
+                        on_change=State.set_query,
                     ),
                     value="tab2",
                 ),

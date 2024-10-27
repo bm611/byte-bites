@@ -57,6 +57,8 @@ def generate_recipe(user_prompt):
     You are an expert at generating recipe based on user prompt.
     Create a recipe in JSON format based on user prompt below. Dont use cups for measurement. Use only metric units.
 
+    Note: If the user provides a list of ingredients like (tomato, onion, spinach etc) recommend the most appropriate recipe that can be made with those ingredients.
+
 
     json schema example:
 
