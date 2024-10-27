@@ -4,7 +4,13 @@ import reflex as rx
 def nav_section() -> rx.Component:
     return rx.box(
         rx.hstack(
-            rx.text("Byte-Bites", class_name="text-3xl font-extrabold text-black"),
+            rx.link(
+                rx.text(
+                    "Byte-Bites",
+                    class_name="text-3xl font-extrabold text-black cursor-pointer",
+                ),
+                on_click=rx.redirect("/"),
+            ),
             rx.button(
                 "Github",
                 class_name="text-xl text-black bg-transparent hidden md:block underline cursor-pointer",

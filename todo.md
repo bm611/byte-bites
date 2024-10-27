@@ -1,2 +1,1 @@
-- change search type design
-- add gemini backend
+- fix state vars for input query
