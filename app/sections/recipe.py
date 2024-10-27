@@ -1,7 +1,6 @@
 import reflex as rx
 from typing import TypedDict
 from .state import State
-from .nav import nav_section
 
 
 class Ingredient(TypedDict):
@@ -40,7 +39,7 @@ def recipe_page() -> rx.Component:
             ),
             rx.box(
                 rx.image(
-                    src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&q=80",
+                    src=State.recipe_img_url,
                     class_name="w-full h-full object-cover opacity-80",
                 ),
                 rx.box(class_name="absolute inset-0 bg-black/20"),
