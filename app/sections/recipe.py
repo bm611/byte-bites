@@ -28,7 +28,16 @@ def render_ingredients(items: Ingredient):
 def recipe_page() -> rx.Component:
     return rx.box(
         rx.vstack(
-            nav_section(),
+            rx.box(
+                rx.link(
+                    rx.text(
+                        "Byte-Bites",
+                        class_name="text-3xl font-black text-center cursor-pointer text-black hover:text-gray-700",
+                    ),
+                    href="/",
+                ),
+                class_name="bg-orange-400 border-4 border-black p-4 transform rotate-1 mt-6",
+            ),
             rx.box(
                 rx.image(
                     src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&q=80",
