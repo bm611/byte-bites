@@ -1,4 +1,5 @@
 import reflex as rx
+from reflex.components.core.colors import Color
 from .state import State
 
 
@@ -31,6 +32,26 @@ def input_section() -> rx.Component:
                     value="tab1",
                 ),
                 rx.tabs.content(
+                    rx.center(
+                        rx.select(
+                            [
+                                "Japanese",
+                                "Italian",
+                                "Mexican",
+                                "Chinese",
+                                "Indian",
+                                "Thai",
+                                "French",
+                                "Mediterranean",
+                                "American",
+                                "Korean",
+                            ],
+                            placeholder="Select Cuisine Type",
+                            radius="full",
+                            on_change=State.set_cuisine,
+                        ),
+                        class_name="mt-4",
+                    ),
                     rx.input(
                         class_name="mt-2 md:mt-4 h-12 w-full px-2 md:w-[40rem] text-xl bg-transparent rounded-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0)] hover:translate-x-1 hover:translate-y-1 transition-all focus:outline-none text-black",
                         on_change=State.set_query,
@@ -39,6 +60,7 @@ def input_section() -> rx.Component:
                 ),
                 default_value="tab1",
                 class_name="w-full md:w-[40rem]",
+                on_change=State.set_active_tab,
             ),
             rx.button(
                 rx.hstack(

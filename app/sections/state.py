@@ -43,26 +43,84 @@ class Recipe(TypedDict):
     instructions: List[str]
 
 
+def create_image_prompt(user_prompt: str) -> str:
+    """Convert user recipe prompt into an optimized image generation prompt.
+
+    Args:
+        user_prompt: The user's recipe request/description
+
+    Returns:
+        A formatted prompt optimized for food image generation
+    """
+    base_prompt = """Professional food photography of"""
+
+    style_elements = """
+    high-end restaurant presentation,
+    soft natural lighting,
+    shallow depth of field,
+    garnished and styled,
+    vibrant colors,
+    shot from a 45-degree angle,
+    on a rustic wooden table,
+    4k quality, ultra detailed
+    """
+
+    # Clean up user prompt and remove cooking instructions
+    cleaned_prompt = user_prompt.lower()
+    cleaned_prompt = (
+        cleaned_prompt.split("recipe")[0]
+        if "recipe" in cleaned_prompt
+        else cleaned_prompt
+    )
+    cleaned_prompt = (
+        cleaned_prompt.split("how to")[0]
+        if "how to" in cleaned_prompt
+        else cleaned_prompt
+    )
+
+    # Construct final prompt
+    image_prompt = f"{base_prompt} {cleaned_prompt}, {style_elements}"
+
+    return image_prompt.strip()
+
+
 def generate_recipe_image(user_prompt):
+    formatted_prompt = create_image_prompt(user_prompt)
     response = client.images.generate(
-        prompt=user_prompt,
+        prompt=formatted_prompt,
         model="black-forest-labs/FLUX.1-schnell",
         n=1,
     )
     return response.data[0].url
 
 
-def generate_recipe(user_prompt):
-    PROMPT = f"""
+def generate_recipe(user_prompt, is_ingredient_search=False, cuisine=None):
+    base_prompt = """
     You are an expert at generating recipe based on user prompt.
     Create a recipe in JSON format based on user prompt below. Dont use cups for measurement. Use only metric units.
+    """
 
-    Note: If the user provides a list of ingredients like (tomato, onion, spinach etc) recommend the most appropriate recipe that can be made with those ingredients.
+    if is_ingredient_search:
+        ingredient_prompt = f"""
+        Given these ingredients and {cuisine} cuisine preference, recommend the most appropriate recipe:
+        Ingredients: {user_prompt}
 
+        Note: The recipe should primarily use the provided ingredients and be influenced by {cuisine} cooking style.
+        """
+        PROMPT = base_prompt + ingredient_prompt
+    else:
+        PROMPT = (
+            base_prompt
+            + f"""
+        Note: If the user provides a list of ingredients like (tomato, onion, spinach etc) recommend the most appropriate recipe that can be made with those ingredients.
 
+        USER RECIPE REQUEST: {user_prompt}
+        """
+        )
+
+    PROMPT += """
     json schema example:
-
-    {{
+    {
         "title": "Healthy Breakfast Omelette",
         "description": "A light and nutritious omelette packed with vegetables.",
         "prepTime": "5 minutes",
@@ -70,9 +128,9 @@ def generate_recipe(user_prompt):
         "servings": 1,
         "calories": 250,
         "ingredients": [
-        {{"item": "Eggs", "amount": 2, "unit": ""}},
-        {{"item": "Milk", "amount": 20, "unit": "ml"}},
-        {{"item": "Cream", "amount": 20, "unit": "ml"}},
+        {"item": "Eggs", "amount": 2, "unit": ""},
+        {"item": "Milk", "amount": 20, "unit": "ml"},
+        {"item": "Cream", "amount": 20, "unit": "ml"}
         ],
         "instructions": [
             "Whisk eggs and milk together in a bowl. Season with salt and pepper.",
@@ -83,12 +141,11 @@ def generate_recipe(user_prompt):
             "Pour egg mixture into the pan.",
             "Cook until the edges are set, then gently lift the edges to allow uncooked egg to flow underneath.",
             "Cook until the omelette is set but still slightly moist, about 3-4 minutes more.",
-            "Fold the omelette in half and serve immediately.",
-        ],
-    }}
-
-    USER RECIPE REQUEST: {user_prompt}
+            "Fold the omelette in half and serve immediately."
+        ]
+    }
     """
+
     response = model_json.generate_content(PROMPT).text
     response = json.loads(response)
     return response
@@ -171,9 +228,17 @@ class State(rx.State):
     recipe_img_url: str = ""
     serving_slider: int = 1
     default_serving_size: int = 0
+    cuisine: str = ""
+    active_tab: str = "tab1"
 
     def set_end(self, value: list[int]):
         self.serving_slider = value[0]
+
+    def set_cuisine(self, cuisine: str):
+        self.cuisine = cuisine
+
+    def set_active_tab(self, tab: str):
+        self.active_tab = tab
 
     def handle_serving(self):
         new_recipe = recalculate_recipe(self.recipe, self.serving_slider)
@@ -187,8 +252,12 @@ class State(rx.State):
         self.is_generating = True
 
     def handle_submit(self):
-        self.recipe: Recipe = generate_recipe(self.user_prompt)
-        # self.recipe: Recipe = recipe_data
+        is_ingredient_search = self.active_tab == "tab2"
+        self.recipe: Recipe = generate_recipe(
+            self.user_prompt,
+            is_ingredient_search=is_ingredient_search,
+            cuisine=self.cuisine if is_ingredient_search else None,
+        )
         self.default_serving_size = self.recipe["servings"]
         self.serving_slider = self.recipe["servings"]
         img_url = generate_recipe_image(self.user_prompt)
