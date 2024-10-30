@@ -1,5 +1,4 @@
 import reflex as rx
-from reflex.components.core.colors import Color
 from .state import State
 
 
