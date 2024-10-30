@@ -43,7 +43,7 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory with your API keys:
 ```
 TOGETHER_API_KEY=your_together_api_key_here
-GOOGLE_API_KEY=your_google_api_key_here
+GEMINI_API_KEY=your_google_api_key_here
 ```
 
 ## Running the Application
