@@ -1,1 +1,2 @@
 - fix state vars for input query
+- process web URL using scraper and format results

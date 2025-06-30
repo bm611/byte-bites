@@ -13,7 +13,7 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 # gemini
 genai.configure(api_key=GEMINI_API_KEY)
 model_json = genai.GenerativeModel(
-    "gemini-1.5-flash-002",
+    "gemini-2.5-flash",
     generation_config={"response_mime_type": "application/json"},
 )
 
@@ -88,7 +88,7 @@ def generate_recipe_image(user_prompt):
     formatted_prompt = create_image_prompt(user_prompt)
     response = client.images.generate(
         prompt=formatted_prompt,
-        model="black-forest-labs/FLUX.1-schnell",
+        model="black-forest-labs/FLUX.1-kontext-dev",
         n=1,
     )
     return response.data[0].url
