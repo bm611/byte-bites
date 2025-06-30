@@ -18,10 +18,15 @@ model_json = genai.GenerativeModel(
 )
 
 # flux.1 schnell
-client = OpenAI(
-    api_key=TOGETHER_API_KEY,
-    base_url="https://api.together.xyz/v1",
-)
+try:
+    client = OpenAI(
+        api_key=TOGETHER_API_KEY,
+        base_url="https://api.together.xyz/v1",
+    )
+except Exception as e:
+    # If there's an issue with the client initialization, create a minimal client
+    print(f"Warning: OpenAI client initialization failed: {e}")
+    client = None
 
 
 # Define the structure for ingredients
@@ -85,13 +90,21 @@ def create_image_prompt(user_prompt: str) -> str:
 
 
 def generate_recipe_image(user_prompt):
+    if client is None:
+        print("Warning: OpenAI client not available, skipping image generation")
+        return None
+
     formatted_prompt = create_image_prompt(user_prompt)
-    response = client.images.generate(
-        prompt=formatted_prompt,
-        model="black-forest-labs/FLUX.1-kontext-dev",
-        n=1,
-    )
-    return response.data[0].url
+    try:
+        response = client.images.generate(
+            prompt=formatted_prompt,
+            model="black-forest-labs/FLUX.1-dev",
+            n=1,
+        )
+        return response.data[0].url
+    except Exception as e:
+        print(f"Error generating recipe image: {e}")
+        return None
 
 
 def generate_recipe(user_prompt, is_ingredient_search=False, cuisine=None):

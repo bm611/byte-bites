@@ -11,12 +11,11 @@ def nav_section() -> rx.Component:
                 ),
                 on_click=rx.redirect("/"),
             ),
-            rx.button(
+            rx.link(
                 "Github",
+                href="https://github.com/bm611/byte-bites/tree/main",
                 class_name="text-xl text-black bg-transparent hidden md:block underline cursor-pointer",
-                on_click=rx.redirect(
-                    "https://github.com/bm611/byte-bites/tree/main", external=True
-                ),
+                is_external=True,
             ),
             class_name="flex justify-center md:justify-between items-center h-full mx-6",
         ),

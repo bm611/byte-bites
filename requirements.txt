@@ -7,3 +7,4 @@ openai==1.52.2
 pymdown-extensions==10.11.2
 python-dotenv==1.0.1
 ruff==0.7.1
+reflex==0.7.14
